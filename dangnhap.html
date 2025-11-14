@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title> GROUP - Đăng nhập</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+
+<body>
+
+<div class="top-bar">
+    <div>524107248</div>
+    <div>
+        <a href="#">Facebook</a>
+        <a href="#">Twitter</a>
+        <a href="#">YouTube</a>
+    </div>
+</div>
+
+<header>
+   <div class="logo">
+    <span class="logo-text">LVD GROUP</span>
+</div>
+
+    <nav>
+         <ul>
+                <li><a href="trangchu.html" class="active">Trang chủ</a></li>
+                <li><a href="gioithieu.html">Giới thiệu</a></li>
+                <li><a href="duan.html">Dự án</a></li>
+                <li><a href="tintuc.html">Tin tức</a></li>
+                <li><a href="lienhe.html">Liên hệ</a></li>
+            </ul>
+    </nav>
+
+    <div class="header-right">
+        <a href="dangnhap.html" class="active">Đăng nhập</a> |
+        <a href="dangky.html">Đăng ký</a>
+        <span class="search-icon">&#128269;</span>
+    </div>
+</header>
+
+<div class="form-wrapper">
+    <div class="form-card">
+        <h2>Đăng nhập</h2>
+
+        <!-- FORM ĐĂNG NHẬP -->
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Email hoặc số điện thoại</label>
+                <input id="loginEmail" type="text" placeholder="email@domain.com">
+            </div>
+
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <input id="loginPassword" type="password" placeholder="••••••••">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Đăng nhập</button>
+                <a href="dangky.html" style="font-size:13px;">Chưa có tài khoản? Đăng ký</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- THÊM SCRIPT NGAY TRƯỚC THẺ </body> -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Tài khoản demo
+    const CORRECT_EMAIL = "admin@gmail.com";
+    const CORRECT_PASSWORD = "123456";
+
+    // Lấy các phần tử HTML (phải trùng id với phần form ở trên)
+    const loginForm      = document.getElementById("loginForm");
+    const emailInput     = document.getElementById("loginEmail");
+    const passInput      = document.getElementById("loginPassword");
+    const customerOverlay = document.getElementById("customerOverlay");
+    const supportOverlay  = document.getElementById("supportOverlay");
+    const btnSupport      = document.getElementById("btnSupport");
+    const customerForm    = document.getElementById("customerForm");
+
+    // Nếu thiếu phần tử nào thì dừng, tránh lỗi JS chặn hết nút
+    if (!loginForm || !emailInput || !passInput) {
+        console.error("Thiếu id trong form đăng nhập (loginForm / loginEmail / loginPassword).");
+        return;
+    }
+    if (!btnSupport || !customerOverlay || !supportOverlay || !customerForm) {
+        console.error("Thiếu id của nút hỗ trợ hoặc modal (btnSupport / customerOverlay / supportOverlay / customerForm).");
+        return;
+    }
+
+    // Hàm mở/đóng modal
+    function openModal(el)  { el.style.display = "flex"; }
+    function closeModal(el) { el.style.display = "none"; }
+
+    // ĐĂNG NHẬP
+    loginForm.addEventListener("submit", function (e) {
+        e.preventDefault(); // không reload trang
+
+        const email = emailInput.value.trim();
+        const password = passInput.value;
+
+        if (email === CORRECT_EMAIL && password === CORRECT_PASSWORD) {
+            // tự điền sẵn email vào popup thông tin KH
+            const cusEmailInput = document.getElementById("cusEmail");
+            if (cusEmailInput) cusEmailInput.value = email;
+
+            openModal(customerOverlay);
+        } else {
+            alert("Sai email hoặc mật khẩu!");
+        }
+    });
+
+    // LƯU THÔNG TIN KHÁCH HÀNG
+    customerForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const name    = document.getElementById("cusName").value.trim();
+        const phone   = document.getElementById("cusPhone").value.trim();
+        const email   = document.getElementById("cusEmail").value.trim();
+        const address = document.getElementById("cusAddress").value.trim();
+
+        if (!name || !phone || !email || !address) {
+            alert("Vui lòng nhập đầy đủ thông tin khách hàng.");
+            return;
+        }
+
+        const customerInfo = { name, phone, email, address };
+        localStorage.setItem("lvdCustomer", JSON.stringify(customerInfo));
+
+        closeModal(customerOverlay);
+        alert("Đăng nhập & lưu thông tin khách hàng thành công!");
+        window.location.href = "trangchu.html"; // đổi nếu trang chủ tên khác
+    });
+
+    // NÚT HỖ TRỢ NỔI
+    btnSupport.addEventListener("click", function () {
+        openModal(supportOverlay);
+    });
+
+    // NÚT ĐÓNG MODAL (X và các nút có data-close)
+    document.querySelectorAll("[data-close]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            const target = document.querySelector(this.getAttribute("data-close"));
+            if (target) closeModal(target);
+        });
+    });
+
+    // Click ra ngoài để tắt modal
+    [customerOverlay, supportOverlay].forEach(function (overlay) {
+        overlay.addEventListener("click", function (e) {
+            if (e.target === overlay) {
+                closeModal(overlay);
+            }
+        });
+    });
+});
+</script>
+
+<div class="support-floating" id="btnSupport">
+    <i class="fas fa-headset"></i>
+    <span>Hỗ trợ</span>
+</div>
+
+<!-- MODAL THÔNG TIN KHÁCH HÀNG -->
+<div class="modal-overlay" id="customerOverlay">
+    <div class="modal">
+        <span class="modal-close" data-close="#customerOverlay">&times;</span>
+        <h3>Thông tin khách hàng</h3>
+        <p>Thông tin này được dùng để giao dịch và hỗ trợ bạn nhanh hơn.</p>
+
+        <form id="customerForm">
+            <div class="form-group">
+                <label>Họ và tên</label>
+                <input type="text" id="cusName" placeholder="Nguyễn Văn A" required>
+            </div>
+            <div class="form-group">
+                <label>Số điện thoại</label>
+                <input type="text" id="cusPhone" placeholder="09xx xxx xxx" required>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="cusEmail" placeholder="email@domain.com" required>
+            </div>
+            <div class="form-group">
+                <label>Địa chỉ</label>
+                <input type="text" id="cusAddress" placeholder="Số nhà, đường, quận/huyện..." required>
+            </div>
+
+            <div class="btn-row">
+                <button type="button" class="btn-small btn-secondary" data-close="#customerOverlay">Hủy</button>
+                <button type="submit" class="btn-small btn-primary">Lưu thông tin</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL HỖ TRỢ KHÁCH HÀNG -->
+<div class="modal-overlay" id="supportOverlay">
+    <div class="modal">
+        <span class="modal-close" data-close="#supportOverlay">&times;</span>
+        <h3>Hỗ trợ LVD Group</h3>
+        <p>Nếu cần hỗ trợ nhanh, bạn có thể liên hệ qua:</p>
+        <ul style="font-size:14px; line-height:1.6; margin-left:16px; margin-bottom:10px;">
+            <li>Hotline: <strong>0909 999 999</strong></li>
+            <li>Zalo: <strong>LVD Support</strong></li>
+            <li>Facebook: <strong>facebook.com/lvdgroup</strong></li>
+            <li>Email: <strong>support@lvdgroup.vn</strong></li>
+        </ul>
+        <p style="font-size:13px; opacity:.9;">
+            Thời gian hỗ trợ: 8h00 – 21h00 (thứ 2 – chủ nhật).
+        </p>
+
+        <div class="btn-row">
+            <button type="button" class="btn-small btn-primary" data-close="#supportOverlay">Đã hiểu</button>
+        </div>
+    </div>
+</div>
+    </div>
+</div>
+
+<footer>
+    © 2025 LVD GROUP – Sàn giao dịch bất động sản cao cấp.
+</footer>
+
+
+</body>
+</html>
